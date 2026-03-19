@@ -219,7 +219,7 @@ export function Hero() {
     </section>
 
     {/* ── Game Preview — 3D tilted mockup composition ── */}
-    <section className="relative -mt-10 pb-16 px-6 z-20">
+    <section className="relative -mt-10 px-6">
       <GamePreview />
     </section>
     </>

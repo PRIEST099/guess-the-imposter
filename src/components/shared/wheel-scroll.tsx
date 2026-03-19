@@ -11,8 +11,7 @@ import { motion, useScroll, useTransform, useSpring, type MotionValue } from "fr
 
    1. ENTERS from below — slides up, slightly rotated,
       scaled down, with a subtle blur (depth-of-field)
-   2. CENTERS — full size, sharp, facing the viewer,
-      with a faint glow ring to draw the eye
+   2. CENTERS — full size, sharp, facing the viewer
    3. EXITS at top — slides up further, rotates away,
       scales down, blurs out
 
@@ -20,7 +19,7 @@ import { motion, useScroll, useTransform, useSpring, type MotionValue } from "fr
    - All transforms are GPU-composited (transform + opacity)
    - filter: blur() is only applied at edges (0px at center)
    - useSpring gives smooth 60fps interpolation
-   - will-change hints used sparingly
+   - No perspective/translateZ to avoid pointer-event issues
    ═══════════════════════════════════════════════════════ */
 
 /* ── Shared spring config — light, responsive ── */
@@ -92,13 +91,6 @@ export function WheelSection({
     [0, 0.6, 1, 1, 0.6, 0]
   );
 
-  // Z-translation for depth push
-  const translateZ = useTransform(
-    smooth,
-    [0, 0.35, 0.5, 0.65, 1],
-    [-40, -8, 0, -8, -40]
-  );
-
   // Blur for depth-of-field (only at far edges, 0 at center)
   const blur = useTransform(
     smooth,
@@ -124,7 +116,6 @@ export function WheelSection({
       ref={ref}
       id={id}
       className={`relative ${className}`}
-      style={{ perspective: "1000px" }}
     >
       <motion.div
         style={{
@@ -132,7 +123,6 @@ export function WheelSection({
           rotateX,
           scale,
           opacity,
-          translateZ,
           filter,
           transformOrigin: "center center",
           willChange: "transform, opacity, filter",
@@ -146,7 +136,6 @@ export function WheelSection({
 
 /* ═══════════════════════════════════════════════════════
    WHEEL CONTAINER — The page-level wrapper.
-   Keeps preserve-3d so child perspectives compose.
    ═══════════════════════════════════════════════════════ */
 interface WheelContainerProps {
   children: ReactNode;
@@ -155,10 +144,7 @@ interface WheelContainerProps {
 
 export function WheelContainer({ children, className = "" }: WheelContainerProps) {
   return (
-    <div
-      className={`relative ${className}`}
-      style={{ transformStyle: "preserve-3d" }}
-    >
+    <div className={`relative ${className}`}>
       {children}
     </div>
   );

@@ -75,7 +75,7 @@ export function JoinForm() {
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
       viewport={{ once: true }}
       transition={{ duration: 0.8, ease: [0.25, 0.4, 0.25, 1] }}
-      className="relative z-10 flex flex-col sm:flex-row items-center gap-4 justify-center -mt-20 pb-8 px-6 sm:px-4 w-full max-w-md sm:max-w-none mx-auto"
+      className="relative z-30 flex flex-col sm:flex-row items-center gap-4 justify-center pt-8 pb-8 px-6 sm:px-4 w-full max-w-md sm:max-w-none mx-auto"
     >
       {/* Create Game Button */}
       <motion.div
