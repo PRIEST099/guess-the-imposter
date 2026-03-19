@@ -11,30 +11,32 @@ import { usePlayerStore } from "@/stores/player-store";
 import { Plus, LogIn, Gamepad2, Sparkles, Globe } from "lucide-react";
 import { GlassButton } from "@/components/shared/glass-button";
 
-export function JoinForm() {
-  const router = useRouter();
-  const [roomCode, setRoomCode] = useState("");
-  const [createOpen, setCreateOpen] = useState(false);
-  const [joinOpen, setJoinOpen] = useState(false);
-  const { nickname, avatarId, setProfile } = usePlayerStore();
-  const [localNickname, setLocalNickname] = useState(nickname);
-  const [localAvatar, setLocalAvatar] = useState(avatarId);
+/* ── ProfileSetup — extracted outside JoinForm to prevent
+     remount on every keystroke (stable component identity) ── */
+interface ProfileSetupProps {
+  onSubmit: () => void;
+  submitLabel: string;
+  showRoomCode?: boolean;
+  localNickname: string;
+  setLocalNickname: (v: string) => void;
+  localAvatar: string;
+  setLocalAvatar: (v: string) => void;
+  roomCode: string;
+  setRoomCode: (v: string) => void;
+}
 
-  const handleCreate = () => {
-    if (!localNickname.trim()) return;
-    setProfile(localNickname.trim(), localAvatar);
-    setCreateOpen(false);
-    router.push("/lobby/create");
-  };
-
-  const handleJoin = () => {
-    if (!localNickname.trim() || !roomCode.trim()) return;
-    setProfile(localNickname.trim(), localAvatar);
-    setJoinOpen(false);
-    router.push(`/lobby/${roomCode.toUpperCase()}`);
-  };
-
-  const ProfileSetup = ({ onSubmit, submitLabel, showRoomCode = false }: { onSubmit: () => void; submitLabel: string; showRoomCode?: boolean }) => (
+function ProfileSetup({
+  onSubmit,
+  submitLabel,
+  showRoomCode = false,
+  localNickname,
+  setLocalNickname,
+  localAvatar,
+  setLocalAvatar,
+  roomCode,
+  setRoomCode,
+}: ProfileSetupProps) {
+  return (
     <div className="space-y-6">
       <NicknameInput value={localNickname} onChange={setLocalNickname} />
 
@@ -68,6 +70,30 @@ export function JoinForm() {
       </GlassButton>
     </div>
   );
+}
+
+export function JoinForm() {
+  const router = useRouter();
+  const [roomCode, setRoomCode] = useState("");
+  const [createOpen, setCreateOpen] = useState(false);
+  const [joinOpen, setJoinOpen] = useState(false);
+  const { nickname, avatarId, setProfile } = usePlayerStore();
+  const [localNickname, setLocalNickname] = useState(nickname);
+  const [localAvatar, setLocalAvatar] = useState(avatarId);
+
+  const handleCreate = () => {
+    if (!localNickname.trim()) return;
+    setProfile(localNickname.trim(), localAvatar);
+    setCreateOpen(false);
+    router.push("/lobby/create");
+  };
+
+  const handleJoin = () => {
+    if (!localNickname.trim() || !roomCode.trim()) return;
+    setProfile(localNickname.trim(), localAvatar);
+    setJoinOpen(false);
+    router.push(`/lobby/${roomCode.toUpperCase()}`);
+  };
 
   return (
     <motion.div
@@ -103,7 +129,16 @@ export function JoinForm() {
               Create New Game
             </DialogTitle>
           </DialogHeader>
-          <ProfileSetup onSubmit={handleCreate} submitLabel="Create Game" />
+          <ProfileSetup
+            onSubmit={handleCreate}
+            submitLabel="Create Game"
+            localNickname={localNickname}
+            setLocalNickname={setLocalNickname}
+            localAvatar={localAvatar}
+            setLocalAvatar={setLocalAvatar}
+            roomCode={roomCode}
+            setRoomCode={setRoomCode}
+          />
         </DialogContent>
       </Dialog>
 
@@ -134,7 +169,17 @@ export function JoinForm() {
               Join Game
             </DialogTitle>
           </DialogHeader>
-          <ProfileSetup onSubmit={handleJoin} submitLabel="Join Game" showRoomCode />
+          <ProfileSetup
+            onSubmit={handleJoin}
+            submitLabel="Join Game"
+            showRoomCode
+            localNickname={localNickname}
+            setLocalNickname={setLocalNickname}
+            localAvatar={localAvatar}
+            setLocalAvatar={setLocalAvatar}
+            roomCode={roomCode}
+            setRoomCode={setRoomCode}
+          />
         </DialogContent>
       </Dialog>
 
